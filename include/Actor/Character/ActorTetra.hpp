@@ -26,16 +26,16 @@ struct ActorTetra_4b0 {
     /* 08 */ unk32 *mUnk_08;
     /* 0c */ ActorTetra_4cc *mUnk_0c;
     /* 10 */ ActorTetra_4cc *mUnk_10;
-    /* 14 */ unk32 mUnk_14; // always sizeof(ActorTetra_4cc)?
+    /* 14 */ size_t size;
     /* 18 */ unk32 mUnk_18;
-    /* 1c */ // PAD(0x1c, 0x38);
+    /* 1c */
 
     inline ActorTetra_4b0(ActorTetra_4cc *unk_0c, ActorTetra_4cc *unk_10, unk32 size) :
         mUnk_00(0),
         mUnk_04(0),
         mUnk_0c(unk_0c),
         mUnk_10(unk_10),
-        mUnk_14(size) {}
+        size(size) {}
 
     void func_ov031_02181610(func_ov031_02181610_param1 *param1, unk32 param2, unk32 param3, unk32 param4, u16 param5);
     void func_ov031_02181798();
@@ -63,10 +63,3 @@ public:
     inline ActorTetra() :
         mUnk_4b0(&mUnk_4cc, &mUnk_e8c, sizeof(mUnk_4cc)) {}
 };
-
-struct func_ov031_02181610_stack {
-    /* 0x00 */ ActorTetra_4b0 *sp0;                           /* inferred */
-    /* 0x04 */ unk32 sp4;                             /* inferred */
-    /* 0x08 */ unk32 sp8;                             /* inferred */
-    /* 0x0c */ char padC[0x24];
-};                                                  /* size = 0x30 */

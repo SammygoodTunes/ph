@@ -4,8 +4,10 @@
 
 extern u32 **data_027e0fe0[];
 extern UnkStruct_027e0fec *data_027e0fec;
+extern unk32 sUnk1;
+extern unk32 sUnk2;
 
-extern void CleanDataCacheLines(void *, unk32);
+extern void CleanDataCacheLines(void *ptr, unsigned int size);
 extern bool func_02017d30(bool, unk32, ActorTetra_4cc *, unk32);
 
 ARM ActorTetra *ActorTetra::Create() {
@@ -14,19 +16,16 @@ ARM ActorTetra *ActorTetra::Create() {
 
 ARM bool ActorTetra::vfunc_f4() {
     static const unk32 sUnk1[] = {0x800, 0x4cd, 0x10cd};
-    static const char sUnk2[8] = "wait";
-    static const char sUnk3[4] = "TTR";
-    static const char sUnk4[8] = "sekika";
 
     if (gAdventureFlags->Get(AdventureFlag_PlayedBellumTakesOverGhostShipCS)) {
         return false;
     }
     mUnk_1d8.func_ov014_02145a74(0x37, 0x37);
-    mUnk_1d8.func_ov014_02145ae8(0x37, sUnk3, sUnk4);
+    mUnk_1d8.func_ov014_02145ae8(0x37, "TTR", "sekika");
     func_ov014_021451f0(sUnk1);
     mUnk_448 = 4;
     if (mUnk_020.mUnk_00[0] == 0 && mUnk_020.mUnk_00[2] == 1) {
-        mUnk_1d8.mUnk_18          = sUnk2;
+        mUnk_1d8.mUnk_18          = &sUnk2;
         mUnk_1d8.mUnk_020.mUnk_8e = true;
         mUnk_1d8.func_ov014_02146120(0);
         mUnk_469         = true;
@@ -54,57 +53,51 @@ ARM void ActorTetra::vfunc_20(bool param1) {
     mUnk_4b0.func_ov031_02181798();
 }
 
-/* UnkStruct_027e0fec mUnk_c10 type to change from func_ov031_02181610_param1 to correct type */
-ARM void ActorTetra_4b0::func_ov031_02181610(func_ov031_02181610_param1 *param1, unk32 param2, unk32 param3, unk32 param4,
+ARM void ActorTetra_4b0::func_ov031_02181610(func_ov031_02181610_param1 *tex_ptr, unk32 param2, unk32 param3, unk32 param4,
                                              u16 param5) {
-    func_ov031_02181610_stack s;
-    s.sp0 = this;
+    this->mUnk_08 = (unk32 *) ((unk32) tex_ptr + tex_ptr->mUnk_38);
+    this->mUnk_18 = ((u32) (tex_ptr->mUnk_2c << 16) >> 13);
 
-    this->mUnk_08 = (unk32 *) ((unk32) param1 + param1->mUnk_38);
-    this->mUnk_18 = ((u32) (param1->mUnk_2c << 0x10) >> 0xD);
-    unk32 temp1   = param1->mUnk_30;
-    u32 temp2     = this->mUnk_14;
+    size_t size = tex_ptr->mUnk_30 * 8;
 
-    s.sp4 = param3;
-    s.sp8 = temp1 * 8;
-
-    if (temp2 < (u32) (temp1 * 8)) {
-        s.sp8 = temp2;
+    if (size > this->size) {
+        size = this->size;
     }
-    if (s.sp8 < temp2) {
-        s.sp0->mUnk_14 = s.sp8;
+    if (size < this->size) {
+        this->size = size;
     }
+    unk32 tempcool = (param5 & 31);
+    unk32 temp4    = (param5 & 0x3e0) >> 5;
+    unk32 temp5    = (param5 & 0x7c00) >> 10;
 
-    unk32 temp5  = (param5 & 0x7c00) >> 0xa;
-    u32 temp9    = s.sp8 >> 1;
-    unk32 temp4  = (param5 & 0x3e0) >> 5;
-    unk32 *var7  = s.sp0->mUnk_08;
-    unk32 *var8  = (unk32 *) s.sp0->mUnk_0c;
-    unk32 temp11 = (unk32) ((param2 * CoDivide64By32(0x1f000, ((param5 & 0x1f) + 0x1f) * 4096)) + 0x800) >> 0xc;
-    unk32 temp6  = (unk32) ((s.sp4 * CoDivide64By32(0x1f000, (temp4 + 0x1f) * 4096)) + 0x800) >> 0xc;
-    unk32 var2   = 0;
-    unk32 temp14 = (s32) ((param4 * CoDivide64By32(0x1f000, (temp5 + 0x1f) * 4096)) + 0x800) >> 0xc;
+    unk32 temp9 = size >> 1;
 
-    if ((s32) temp9 > 0) {
-        do {
-            unk32 temp10 = *var7;
-            var2 += 1;
-            var7 += 2;
-            unk32 temp10_2 = (((unk32) temp10 >> 0xa) & 0x1f) + ((temp10 & 0x1f) + (((unk32) temp10 >> 5) & 0x1f));
-            unk32 var3     = (unk32) ((temp10_2 * temp11) + ((u32) (param5 << 0x1b) >> 0xf)) >> 0xc;
-            unk32 varip    = (unk32) ((temp10_2 * temp6) + (temp4 << 0xc)) >> 0xc;
-            if (varip > 0x1f) {
-                varip = 0x1f;
-            }
-            unk32 var0 = (unk32) ((temp10_2 * temp14) + (temp5 << 0xc)) >> 0xc;
-            if (var0 > 0x1f) {
-                var0 = 0x1f;
-            }
-            *var8 = var3 | (varip << 5) | (var0 << 0xa);
-            var8 += 2;
-        } while (var2 < (unk32) temp9);
+    u16 *pSrc  = (u16 *) this->mUnk_08;
+    u16 *pDest = (u16 *) this->mUnk_0c;
+    q20 temp11 = ROUND_Q20(param2 * CoDivide64By32(INT_TO_Q20(31), INT_TO_Q20(tempcool + 31)));
+    q20 temp6  = ROUND_Q20(param3 * CoDivide64By32(INT_TO_Q20(31), INT_TO_Q20(temp4 + 31)));
+    q20 temp14 = ROUND_Q20(param4 * CoDivide64By32(INT_TO_Q20(31), INT_TO_Q20(temp5 + 31)));
+
+    for (int var2 = 0; var2 < temp9; var2++) {
+        unk32 temp10_2 = (*pSrc & 31) + ((*pSrc >> 5) & 31) + ((*pSrc >> 10) & 31);
+
+        unk32 var3 = (unk32) ((temp10_2 * temp11) + ((u32) (param5 << 27) >> 15)) >> 12;
+        if (var3 > 31) {
+            var3 = 31;
+        }
+        unk32 varip = ((temp10_2 * temp6) + INT_TO_Q20(temp4)) >> 12;
+        if (varip > 31) {
+            varip = 31;
+        }
+        unk32 var0 = (unk32) ((temp10_2 * temp14) + INT_TO_Q20(temp5)) >> 12;
+        if (var0 > 31) {
+            var0 = 31;
+        }
+        *pDest = var3 | (varip << 5) | (var0 << 10);
+        pDest++;
+        pSrc++;
     }
-    CleanDataCacheLines(s.sp0->mUnk_0c, s.sp8);
+    CleanDataCacheLines(this->mUnk_0c, size);
 }
 
 ARM void ActorTetra_4b0::func_ov031_02181798() {
@@ -113,37 +106,37 @@ ARM void ActorTetra_4b0::func_ov031_02181798() {
     int iVar3;
     u32 uVar4;
     int iVar5;
-    ActorTetra_4cc *puVar6;
+    unk32 *puVar6;
     int iVar7;
     u32 uVar8;
     unk32 *puVar9;
-    ActorTetra_4cc *puVar10;
+    unk32 *puVar10;
+    unk32 iVar11;
 
     if (this->mUnk_00 == this->mUnk_04) {
         return;
     }
     this->mUnk_04 = this->mUnk_00;
-    uVar1         = this->mUnk_14;
+    uVar1         = this->size;
     iVar7         = 0;
-    puVar6        = this->mUnk_10;
+    puVar6        = (unk32 *) this->mUnk_10;
     puVar9        = this->mUnk_08;
-    puVar10       = this->mUnk_0c;
+    puVar10       = (unk32 *) this->mUnk_0c;
     if (uVar1 >> 1 != 0) {
-        /*do {
-            uVar8   = (uint) *puVar10;
-            uVar4   = (uint) *puVar9;
-            iVar2   = *param_1;
-            iVar7   = iVar7 + 1;
+        for (int i = 0; i < uVar1 >> 1; i++) {
+            uVar8   = (unk32) *puVar10;
+            uVar4   = (u32) *puVar9;
+            iVar2   = this->mUnk_00;
             iVar3   = 0x1000 - iVar2;
-            param_3 = (uVar4 & 0x1f) * iVar3 + (uVar8 & 0x1f) * iVar2;
+            iVar11  = (uVar4 & 0x1f) * iVar3 + (uVar8 & 0x1f) * iVar2;
             iVar5   = ((int) (uVar4 & 0x7c00) >> 10) * iVar3 + ((int) (uVar8 & 0x7c00) >> 10) * iVar2 >> 0xc;
-            *puVar6 = (ushort) ((((int) (uVar4 & 0x3e0) >> 5) * iVar3 + ((int) (uVar8 & 0x3e0) >> 5) * iVar2 >> 0xc) << 5) |
-                      (ushort) (param_3 >> 0xc) | (ushort) (iVar5 << 10);
+            *puVar6 = (u16) ((((int) (uVar4 & 0x3e0) >> 5) * iVar3 + ((int) (uVar8 & 0x3e0) >> 5) * iVar2 >> 0xc) << 5) |
+                      (u16) (iVar11 >> 0xc) | (u16) (iVar5 << 10);
             puVar6  = puVar6 + 1;
             puVar9  = puVar9 + 1;
             puVar10 = puVar10 + 1;
-        } while (iVar7 < (int) (uVar1 >> 1));
-    */}
-        CleanDataCacheLines(this->mUnk_10, this->mUnk_14);
-        func_02017d30(true, this->mUnk_18, this->mUnk_10, this->mUnk_14);
+        }
+    }
+    CleanDataCacheLines(this->mUnk_10, this->size);
+    func_02017d30(true, this->mUnk_18, this->mUnk_10, this->size);
 }
