@@ -300,8 +300,8 @@ data_ov031_02181abc kind:data(any) addr:0x02181a1c
 data_ov031_02181ac8 kind:data(any) addr:0x02181a28
 data_ov031_02181ad4 kind:data(any) addr:0x02181a34
 data_ov031_02181b10 kind:data(any) addr:0x02181a70
-data_ov031_02181b24 kind:data(any) addr:0x02181a84
-data_ov031_02181b30 kind:data(any) addr:0x02181a90
+sUnk1$1074 kind:data(any) addr:0x02181a84
+sUnk1$1075 kind:data(any) addr:0x02181a90
 __sinit_ActorShopItem.cpp kind:function(arm,size=0x3ec) addr:0x02181acc local
 __sinit_ActorItemSeller.cpp kind:function(arm,size=0xa8) addr:0x02181eb8 local
 __sinit_ov031_02182000 kind:function(arm,size=0x40) addr:0x02181f60

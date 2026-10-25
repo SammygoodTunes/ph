@@ -8,14 +8,32 @@ extern unk32 sUnk1;
 extern unk32 sUnk2;
 
 extern void CleanDataCacheLines(void *ptr, unsigned int size);
-extern bool func_02017d30(bool, unk32, ActorTetra_4cc *, unk32);
+extern bool func_02017d30(unk32, unk32, ActorTetra_4cc *, unk32);
 
 ARM ActorTetra *ActorTetra::Create() {
     return new(*data_027e0fe0[0], 4) ActorTetra();
 }
 
+struct ActorTetra_struct {
+    /* 00 */ const char mUnk_00[8];
+    /* 08 */ unk32 mUnk_08;
+    /* 0c */ unk32 mUnk_0c;
+    /* 10 */ unk32 mUnk_10;
+    /* 14 */ unk32 mUnk_14;
+    /* 18 */ unk32 mUnk_18;
+    /* 1c */ unk32 mUnk_1c;
+    /* 20 */ unk32 mUnk_20;
+    /* 24 */ unk32 mUnk_24;
+    /* 28 */ unk32 mUnk_28;
+    /* 2c */ unk32 mUnk_2c;
+    /* 30 */ unk32 mUnk_30;
+    /* 34 */ unk32 mUnk_34;
+    /* 38 */ unk32 mUnk_38;
+};
+
 ARM bool ActorTetra::vfunc_f4() {
-    static const unk32 sUnk1[] = {0x800, 0x4cd, 0x10cd};
+    static const unk32 sUnk1[]           = {0x800, 0x4cd, 0x10cd};
+    static const ActorTetra_struct sUnk2 = {"wait", 0, 0, 0, 0x64, 0, 0, 0, 0, 0x64, 0, 0, 0, 0};
 
     if (gAdventureFlags->Get(AdventureFlag_PlayedBellumTakesOverGhostShipCS)) {
         return false;
@@ -25,7 +43,7 @@ ARM bool ActorTetra::vfunc_f4() {
     func_ov014_021451f0(sUnk1);
     mUnk_448 = 4;
     if (mUnk_020.mUnk_00[0] == 0 && mUnk_020.mUnk_00[2] == 1) {
-        mUnk_1d8.mUnk_18          = &sUnk2;
+        mUnk_1d8.mUnk_18          = (unk32 *) &sUnk2;
         mUnk_1d8.mUnk_020.mUnk_8e = true;
         mUnk_1d8.func_ov014_02146120(0);
         mUnk_469         = true;
@@ -101,42 +119,39 @@ ARM void ActorTetra_4b0::func_ov031_02181610(func_ov031_02181610_param1 *tex_ptr
 }
 
 ARM void ActorTetra_4b0::func_ov031_02181798() {
-    unk32 uVar1;
     int iVar2;
     int iVar3;
     u32 uVar4;
-    int iVar5;
-    unk32 *puVar6;
-    int iVar7;
+    u16 iVar5;
+    u16 *pDest;
     u32 uVar8;
-    unk32 *puVar9;
-    unk32 *puVar10;
-    unk32 iVar11;
+    u16 *pSrc;
+    u16 *pSrc2;
+    u16 iVar11;
 
     if (this->mUnk_00 == this->mUnk_04) {
         return;
     }
     this->mUnk_04 = this->mUnk_00;
-    uVar1         = this->size;
-    iVar7         = 0;
-    puVar6        = (unk32 *) this->mUnk_10;
-    puVar9        = this->mUnk_08;
-    puVar10       = (unk32 *) this->mUnk_0c;
-    if (uVar1 >> 1 != 0) {
-        for (int i = 0; i < uVar1 >> 1; i++) {
-            uVar8   = (unk32) *puVar10;
-            uVar4   = (u32) *puVar9;
-            iVar2   = this->mUnk_00;
-            iVar3   = 0x1000 - iVar2;
-            iVar11  = (uVar4 & 0x1f) * iVar3 + (uVar8 & 0x1f) * iVar2;
-            iVar5   = ((int) (uVar4 & 0x7c00) >> 10) * iVar3 + ((int) (uVar8 & 0x7c00) >> 10) * iVar2 >> 0xc;
-            *puVar6 = (u16) ((((int) (uVar4 & 0x3e0) >> 5) * iVar3 + ((int) (uVar8 & 0x3e0) >> 5) * iVar2 >> 0xc) << 5) |
-                      (u16) (iVar11 >> 0xc) | (u16) (iVar5 << 10);
-            puVar6  = puVar6 + 1;
-            puVar9  = puVar9 + 1;
-            puVar10 = puVar10 + 1;
-        }
+    int halfSize  = this->size >> 1;
+    pSrc          = (u16 *) this->mUnk_08;
+    pSrc2         = (u16 *) this->mUnk_0c;
+    pDest         = (u16 *) this->mUnk_10;
+
+    for (int i = 0; i < halfSize; i++) {
+        uVar8  = *pSrc2;
+        uVar4  = *pSrc;
+        iVar2  = this->mUnk_00;
+        iVar3  = 0x1000 - this->mUnk_00;
+        iVar11 = ((uVar4 & 31) * iVar3 + (uVar8 & 31) * this->mUnk_00) >> 12;
+        iVar5  = ((((int) (uVar4 & 0x7c00) >> 10) * iVar3 + ((int) (uVar8 & 0x7c00) >> 10) * this->mUnk_00) >> 12) << 10;
+
+        *pDest = (u16) (((((int) (uVar4 & 0x3e0) >> 5) * iVar3 + ((int) (uVar8 & 0x3e0) >> 5) * this->mUnk_00) >> 12) << 5) |
+                 iVar11 | iVar5;
+        pDest++;
+        pSrc2++;
+        pSrc++;
     }
     CleanDataCacheLines(this->mUnk_10, this->size);
-    func_02017d30(true, this->mUnk_18, this->mUnk_10, this->size);
+    func_02017d30(1, this->mUnk_18, this->mUnk_10, this->size);
 }
